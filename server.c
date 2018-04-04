@@ -1,18 +1,16 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-
+#include "proj.h"
 
 int main (int argc, char *argv[]) {
 
     int err;
+
     int socketDescriptor;
+    int clientDescriptor;
+
     struct sockaddr_in sSocket;
+    struct sockaddr_in cSocket;
+
+    char cAddress[INET_ADDRSTRLEN];
 
     if (argc != 3) {
         printf("Usage: server <address> <port>\n");
@@ -51,7 +49,17 @@ int main (int argc, char *argv[]) {
             exit(1);
         }
 
+        printf("Server: connection received, waiting for connection...\n");
+        socklen_t cSize = sizeof(cSocket);
+        if ((clientDescriptor = accept(socketDescriptor, (struct sockaddr *)&cSocket, &cSize)) < 0) {
+            perror("accept");
+            exit(1);
+        }
 
+        inet_ntop(AF_INET, &cSocket, cAddress, INET_ADDRSTRLEN);
+        printf("Server: Accepted %s\n", cAddress, cSocket.sin_port);
+
+        receiveMessage();
     }
     
 
