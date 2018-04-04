@@ -1,4 +1,5 @@
 #include "proj.h"
+#include "sendrecv.c"
 
 int main (int argc, char *argv[]) {
 
