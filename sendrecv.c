@@ -41,8 +41,10 @@ int send_mesg(int msgtype, int size, char name[], int senderSocket) { // sends a
     return 0;
 }
 
-int send_data(char name[], int senderSocket) { // loops through reads on the file and sends 1024 blocks to the network
+int send_data(char name[], int senderSocket, int socketType) { // loops through reads on the file and sends 1024 blocks to the network
     int err;
+
+    int totalDataWrote = 0;
 
     FILE * data;
 
@@ -58,11 +60,17 @@ int send_data(char name[], int senderSocket) { // loops through reads on the fil
         msgbuf.msg_type = CMD_DATA;
         msgbuf.data_leng = strlen(msgbuf.buffer);
 
+        totalDataWrote += strlen(msgbuf.buffer);
+
         if ((err = send(senderSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
             fclose(data);
             fail("sendto");
         }
+
+        printf("Sent %lu bytes from file\n", strlen(msgbuf.buffer));
     }
+
+    printf("Wrote %d bytes to remote %s\n", totalDataWrote, socketType == CLIENT ? "client" : "server");
 
     fclose(data);
 
@@ -88,10 +96,14 @@ int recv_data(int receiverSocket, int size, char name[]) { // loops through read
             fail("recv");
         }
 
+        printf("Read %lu bytes\n", strlen(msgbuf.buffer));
+
         currentSize += msgbuf.data_leng;
 
         fprintf(output, "%s", msgbuf.buffer);
     }
+
+    printf("Wrote %d bytes to output file\n", currentSize);
 
     fclose(output);
 
