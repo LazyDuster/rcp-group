@@ -6,11 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sendrecv.c"
-
 #define MAX_DATA_SIZE 1024
-#define CMD_SEND
-#define CMD_RECV
+#define CMD_SEND 0
+#define CMD_RECV 1
+#define CMD_RESP 2
+#define CMD_DATA 3
 
 struct send_msg
 {
@@ -30,5 +30,5 @@ struct data_msg
 {
     int msg_type; // CMD_DATA
     int data_leng; // Length of data in buffer
-    char buffer[1024];
+    char buffer[MAX_DATA_SIZE];
 };
