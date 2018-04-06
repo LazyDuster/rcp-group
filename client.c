@@ -4,6 +4,8 @@ int main(int argc, int *argv[])
 {
     struct sockaddr_in sock;
     struct hostent *host;
+    char send[] = "-S";
+    char rec[] = "-R";
 
     // Convert command line arguments and initialize socket structure
     if (argc != 5) {
@@ -22,10 +24,17 @@ int main(int argc, int *argv[])
 
     // Open socket
     int s;
-    if ((s = socket(sock.sin_family, SOCK_DGRAM, IPPROTO_TCP)) < 0) {
+    if ((s = socket(sock.sin_family, SOCK_STREAM, IPPROTO_TCP)) < 0) {
         perror("Error initializing socket\n");
         exit(1);
     }
 
     // Sending stuff
+    if (strcmp(argv[4], send)) {
+        send_mesg(0, 0, argv[4], s);
+    } else if (strcmp(argv[4], rec)) {
+        // rec_mesg, i'll finish this later tonight probably
+    }
+
+    exit(1);
 }
