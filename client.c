@@ -1,6 +1,6 @@
-#include "proj.h"
+#include "sendrecv.c"
 
-int main(int argc, int *argv[])
+int main(int argc, char *argv[])
 {
     struct sockaddr_in sock;
     struct hostent *host;
@@ -33,7 +33,7 @@ int main(int argc, int *argv[])
     if (strcmp(argv[4], send)) {
         send_mesg(0, 0, argv[4], s);
     } else if (strcmp(argv[4], rec)) {
-        // rec_mesg, i'll finish this later tonight probably
+        recv_data(s, MAX_DATA_SIZE, argv[4]);
     }
 
     exit(1);
