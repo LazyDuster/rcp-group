@@ -5,19 +5,19 @@ void fail(char msg[]) {
     exit(1);
 }
 
-struct send_msg receive_msg(int receiverSocket) { // receives a single message from the network
+struct send_msg receive_msg(int fromSocket) { // receives a single message from the network
     int err = 0;
     
     struct send_msg msgbuf;
 
-    if ((err = recv(receiverSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
+    if ((err = recv(fromSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
         fail("recv");
     }
 
     return msgbuf;
 } 
 
-int send_mesg(int msgtype, int size, char name[], int senderSocket) { // sends a single message to the network
+int send_message(int msgtype, int size, char name[], int toSocket) { // sends a single message to the network
     int err;
 
     struct send_msg msgbuf;
@@ -25,16 +25,12 @@ int send_mesg(int msgtype, int size, char name[], int senderSocket) { // sends a
     msgbuf.file_size = size;
 
     strncpy(msgbuf.filename, name, 128);
-    //msgbuf.filename = name;
 
-    if (msgtype !=  CMD_SEND || msgtype != CMD_RECV) {
-        // throw some error
-    }
-    else {
-        msgbuf.msg_type = msgtype;
-    }
+    msgbuf.msg_type = msgtype;
 
-    if ((err = send(senderSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
+    //printf("type: %d\n", msgbuf.msg_type);
+
+    if ((err = send(toSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
         fail("sendto");
     }
 
@@ -77,7 +73,7 @@ int send_data(char name[], int senderSocket, int socketType) { // loops through 
     return 0;
 }
 
-int recv_data(int receiverSocket, int size, char name[]) { // loops through reads on the network and writes the blocks received to the file
+int recv_data(int fromSocket, int size, char name[]) { // loops through reads on the network and writes the blocks received to the file
     int err;
     
     FILE * output;
@@ -88,10 +84,10 @@ int recv_data(int receiverSocket, int size, char name[]) { // loops through read
         fail("file open");
     }
 
-    while (currentSize <= size) {
+    while (currentSize < size) {
         struct data_msg msgbuf;
 
-        if ((err = recv(receiverSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
+        if ((err = recv(fromSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
             fclose(output);
             fail("recv");
         }

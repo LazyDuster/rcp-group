@@ -63,32 +63,27 @@ int main (int argc, char *argv[]) {
         printf("Connection accepted from %s\n", cAddress);
 
         struct send_msg msgbuf;
-        msgbuf = receive_msg(serverSocket);
+        msgbuf = receive_msg(clientSocket);
 
         if (msgbuf.msg_type == CMD_RECV) {
-            printf("Receive file: %s\n", msgbuf.filename);
-            printf("Receive file length: %d\n", msgbuf.file_size);
+            //printf("Receive file: %s\n", msgbuf.filename);
+            //printf("Receive file length: %d\n", msgbuf.file_size);
 
-            if ((err = recv_data(serverSocket, msgbuf.file_size, msgbuf.filename)) != 0) {
+            if ((err = recv_data(clientSocket, msgbuf.file_size, msgbuf.filename)) != 0) {
                 perror("recv_data");
                 exit(1);
             }
         }
 
         else if (msgbuf.msg_type == CMD_SEND) {
-            char fileName[100];
-
-            printf("Enter the first file to scan:\n");
-            scanf("%s", fileName);
-
-            FILE * fp = fopen("filename", "rb");
+            FILE * fp = fopen(msgbuf.filename, "rb");
             fseek(fp, 0, SEEK_END);
             int length = ftell(fp);
             fclose(fp);
 
-            send_mesg(CMD_RECV, length, fileName, serverSocket);
+            send_message(CMD_RECV, length, msgbuf.filename, clientSocket);
 
-            send_data(fileName, serverSocket, SERVER);
+            send_data(msgbuf.filename, clientSocket, SERVER);
         }
 
         close(clientSocket);
