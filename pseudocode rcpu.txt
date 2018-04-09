@@ -1,0 +1,142 @@
+PSEUDOCODE
+Group Project "rcpu"
+******************************************************************************
+Client.c
+
+if argc is not equal to 5
+	print usage and instructions
+	exit 1
+set sin_family to AF_INET
+if inet_pton does not return 1
+	print invalid address
+	exit 1
+set sin_port to long int conversion of second argument
+if sin_port is less than or equal to 1024 or greater than or equal to 64000
+	print invalid port
+	exit 1
+if socket returns less than 0
+	set perror
+	exit 1
+if connect does not return 0
+	set perror
+	exit 1
+if string comparison of argument 3 and send returns 0
+	open file argument 4
+	seek end of file
+	set length to ftell value of file pointer
+	close file
+	print length
+	send message
+	send data
+else if string comparison of argument 3 and rec returns 0
+	send message
+	set msgbuf equal to receive message
+	
+	receive data
+
+exit 1
+
+******************************************************************************
+server.c
+
+if argc is not equal to 3
+	print usage
+	exit 1
+set sin_family equal to AF_INET
+ 
+if inet_pton does not return 1
+	print "invalid address"
+	exit 1
+set sin_port equal to long int conversion of argument 2
+if sin_port is less than or equal to 1024 or greater than or equal to 64000
+	print "invalid port"
+	exit 1
+if socket returns less than 0
+	set perror
+	exit 1
+if bind does not return 0
+	set perror
+	exit 1
+while 1 (endless loop)
+	if listen does not return 0
+		set perror
+		exit 1
+	set cSize equal to size of clientAddress
+	if accept returns less than zero
+		set perror
+		exit 1
+	print "connection accepted from X"
+	set msgbuf equal to receive_msg<clientSocket>
+	if msg_type equals cmd_recv
+		if recv_data does not return 0
+			set perror
+			exit 1
+	else if msg_type equals cmd_send
+		open file
+		seek end of file
+		set length equal to ftell
+		close file
+		
+		send_message
+		send_data
+	close clientSocket
+close serverSocket
+
+******************************************************************************
+sendrecv.c
+
+void fail takes char array msg
+	set perror with msg
+	exit 1
+
+struct send_msg receive_msg takes int fromSocket
+	if recv returns less than 0
+		fail "recv"
+	return msgbuf
+	
+int send_message takes int msgtype, int size, char array name, int toSocket
+	set msgbuf->file size to size
+	string copy msgbuf->filename from name
+	set msgbuf->msg_type equal to msgtype
+	
+	if send returns less than 0
+		fail "sendto"
+	return 0
+
+int send_data takes char array name, int senderSocket, int socketType
+	set TotalDataWrote to 0
+	if fopen returns null
+		fail "file open"
+	while not end of file
+		get data from file, reading up to max_data_size
+		set msgbuf->msg_type equal to CMD_DATA
+		set msgbuf->data_leng equal to string length of msgbuf->buffer
+		
+		if send returns less than 0
+			close file
+			fail "send to"
+			
+		print "sent X bytes from file"
+	print "wrote X bytes from remote <client or server>"
+	
+	close file
+	return 0
+
+int recv_data takes int fromSocket, int size, char array name
+	set currentSize equal to 0
+	if fopen returns NULL
+		fail "file open"
+	
+	while currentSize is less than size
+		if recv returns less than 0
+			close file
+			fail "recv"
+		print "read X bytes"
+		currentSize equals currentSize plus msgbuf->data_leng
+		print msgbuf->buffer
+	print "Wrote X bytes to output file"
+	close file
+	
+	return 0
+
+	**************************************************************************
