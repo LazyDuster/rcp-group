@@ -45,11 +45,16 @@ int main(int argc, char *argv[])
     // Sending stuff
     if (strcmp(argv[3], send) == 0) {
         FILE * fp = fopen(argv[4], "rb");
+        if (fp == NULL) {
+            perror("fopen");
+            exit(1);
+        }
+        
         fseek(fp, 0, SEEK_END);
         int length = ftell(fp);
         fclose(fp);
 
-        printf("Length: %d", length);
+        //printf("Length: %d", length);
 
         send_message(CMD_RECV, length, argv[4], serverSocket);
         send_data(argv[4], serverSocket, CLIENT);

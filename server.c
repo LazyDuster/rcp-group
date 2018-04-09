@@ -77,6 +77,10 @@ int main (int argc, char *argv[]) {
 
         else if (msgbuf.msg_type == CMD_SEND) {
             FILE * fp = fopen(msgbuf.filename, "rb");
+            if (fp == NULL) {
+                perror("fopen");
+                exit(1);
+            }
             fseek(fp, 0, SEEK_END);
             int length = ftell(fp);
             fclose(fp);
