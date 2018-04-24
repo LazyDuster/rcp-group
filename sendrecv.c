@@ -37,38 +37,40 @@ int send_message(int msgtype, int size, char name[], int toSocket) { // sends a 
     return 0;
 }
 
-int send_data(char name[], int senderSocket, int socketType) { // loops through reads on the file and sends 1024 blocks to the network
-    int err;
-
+int send_data(char name[], int length, int senderSocket, int socketType) { // loops through reads on the file and sends 1024 blocks to the network
+    int err1;
+    int err2;
     int totalDataWrote = 0;
 
-    FILE * data;
-
-    if ((data = fopen(name, "r")) == NULL) {
-        fail("file open");
+    int fd;
+    if ((fd = open(name, O_RDONLY)) < 0) {
+        fail("open");
     }
 
-    while (!feof (data)) {
+    do {
         struct data_msg msgbuf;
+        err1 = read(fd, msgbuf.buffer, MAX_DATA_SIZE - 1);
 
-        fgets(msgbuf.buffer, MAX_DATA_SIZE, (FILE*)data);
+        msgbuf.buffer[err1] = '\0'; 
+        // We only read 1023 byte and replace the 1024th byte with a null byte
+        // I can't seem to get it to work if I was to send 1024 bytes directly
 
         msgbuf.msg_type = CMD_DATA;
-        msgbuf.data_leng = strlen(msgbuf.buffer);
+        msgbuf.data_leng = err1;
 
-        totalDataWrote += strlen(msgbuf.buffer);
+        totalDataWrote += err1;
 
-        if ((err = send(senderSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
-            fclose(data);
+        if ((err2 = send(senderSocket, &msgbuf, sizeof(msgbuf), 0)) < 0) {
+            close(fd);
             fail("sendto");
         }
 
-        printf("Sent %lu bytes from file\n", strlen(msgbuf.buffer));
-    }
+        printf("Sent %d bytes from file\n", err1);
+    } while (err1 >= MAX_DATA_SIZE - 1);
 
     printf("Wrote %d bytes to remote %s\n", totalDataWrote, socketType == CLIENT ? "client" : "server");
 
-    fclose(data);
+    close(fd);
 
     return 0;
 }

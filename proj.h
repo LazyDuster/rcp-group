@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #define MAX_DATA_SIZE 1024
 #define CMD_SEND 0
@@ -36,3 +37,11 @@ struct data_msg
     int data_leng; // Length of data in buffer
     char buffer[MAX_DATA_SIZE];
 };
+
+struct send_msg receive_msg(int fromSocket);
+
+int send_message(int msgtype, int size, char name[], int toSocket);
+
+int send_data(char name[], int length, int senderSocket, int socketType);
+
+int recv_data(int fromSocket, int size, char name[]);

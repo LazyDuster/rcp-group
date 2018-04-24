@@ -1,4 +1,4 @@
-#include "sendrecv.c"
+#include "proj.h"
 
 int main (int argc, char *argv[]) {
 
@@ -87,7 +87,7 @@ int main (int argc, char *argv[]) {
 
             send_message(CMD_RECV, length, msgbuf.filename, clientSocket);
 
-            send_data(msgbuf.filename, clientSocket, SERVER);
+            send_data(msgbuf.filename, length, clientSocket, SERVER);
         }
 
         close(clientSocket);

@@ -1,4 +1,4 @@
-#include "sendrecv.c"
+#include "proj.h"
 
 int main(int argc, char *argv[])
 {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
         //printf("Length: %d", length);
 
         send_message(CMD_RECV, length, argv[4], serverSocket);
-        send_data(argv[4], serverSocket, CLIENT);
+        send_data(argv[4], length, serverSocket, CLIENT);
 
     } else if (strcmp(argv[3], rec) == 0) {
         struct send_msg msgbuf;
